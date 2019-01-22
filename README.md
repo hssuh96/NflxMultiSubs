@@ -14,8 +14,8 @@ Original project (原創項目): https://github.com/dannvix/NflxMultiSubs
 Best ever Chrome/Firefox extension to unleash bilingual subtitles on Netflix!  
 全球首款支援 Netflix 全語言雙字幕的 Chrome/Firefox 擴充套件，提供您更佳的觀影體驗！
 
-[![Download on Chrome Web Store](docs/chrome-webstore-badge58.png?raw=true)](#)
-[![Download on Firefox Add-ons](docs/firefox-addons-badge58.png?raw=true)](#)
+[https://chrome.google.com/webstore/detail/nflxmultisubs-netflix-mul/kbefmlcbiedkojoielehjmlchhccglgf](docs/chrome-webstore-badge58.png?raw=true)](#)
+Firefox version coming soon!
 
 
 
