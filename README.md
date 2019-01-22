@@ -1,6 +1,10 @@
 > Dan Chen (dannvix), the original developer, had to stop development, because of lack of time. I have made some fixes so that the extension works again.
 > [機器翻譯] 由於時間不夠，原始開發商Dan Chen（dannvix）不得不停止開發。 我做了一些修復，以便擴展再次工作。
 
+New Chome Webstore link (go here to install): https://chrome.google.com/webstore/detail/nflxmultisubs-netflix-mul/kbefmlcbiedkojoielehjmlchhccglgf
+
+Firefox version coming soon.
+
 Original project (原創項目): https://github.com/dannvix/NflxMultiSubs
 
 ----
@@ -13,9 +17,6 @@ Original project (原創項目): https://github.com/dannvix/NflxMultiSubs
 ============================================================
 Best ever Chrome/Firefox extension to unleash bilingual subtitles on Netflix!  
 全球首款支援 Netflix 全語言雙字幕的 Chrome/Firefox 擴充套件，提供您更佳的觀影體驗！
-
-[https://chrome.google.com/webstore/detail/nflxmultisubs-netflix-mul/kbefmlcbiedkojoielehjmlchhccglgf](docs/chrome-webstore-badge58.png?raw=true)](#)
-Firefox version coming soon!
 
 
 
