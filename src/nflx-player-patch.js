@@ -1,3 +1,5 @@
+/*
+
 const acorn = require('acorn');
 const console = require('./console');
 
@@ -320,9 +322,30 @@ function injectHiResHackFirefox(script) {
 
 // -----------------------------------------------------------------------------
 
+*/
 
 module.exports = {
   patch: (script) => {
+
+    const ourName = 'window.__NflxMultiSubs';
+
+    payload = 
+    `
+    var JP_OLD = JSON.parse; 
+    JSON.parse = function(data){ 
+        var parsed = JP_OLD(data); 
+        if(parsed.result && parsed.result.timedtexttracks) { 
+            // window.manifests.push(parsed); 
+            ${ourName}&&${ourName}.updateManifest(parsed.result);
+        } 
+        return parsed;
+    };
+    `
+    
+
+    script = payload + script;
+
+/*
     let patched = injectCallback(script);
     if (patched) {
       script = patched;
@@ -347,6 +370,7 @@ module.exports = {
     else {
       console.error('Error: cannot inject hi-res hack');
     }
+*/
     return script;
   }
 };

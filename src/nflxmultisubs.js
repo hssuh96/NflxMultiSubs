@@ -284,12 +284,16 @@ class ImageSubtitle extends SubtitleBase {
 // -----------------------------------------------------------------------------
 
 class SubtitleFactory {
-  // track: manifest.textTracks[...]
+  // track: manifest.timedtexttracks[...]
   static build(track) {
-    const isImageBased = track.downloadables.some(d => d.isImage);
+    // Image based subs are nflx-cmisc
+    // Text based are dfxp-ls-sdh or simplesdh
+    // const isImageBased = track.downloadables.some(d => d["nflx-cmisc"]);
+    const isImageBased = track.ttDownloadables["nflx-cmisc"];
     const isCaption = track.trackType === 'CLOSEDCAPTIONS';
-    const lang = track.language + (isCaption ? ' [CC]' : '');
-    const bcp47 = track.bcp47;
+    // These were updated in the API chnage:
+    const lang = track.languageDescription + (isCaption ? ' [CC]' : '');
+    const bcp47 = track.language;
 
     if (isImageBased) {
       return this._buildImageBased(track, lang, bcp47);
@@ -297,34 +301,41 @@ class SubtitleFactory {
     return this._buildTextBased(track, lang, bcp47);
   }
 
-  static _buildImageBased(track, lang, bcp47) {
-    const maxHeight = Math.max(...track.downloadables.map(d => d.pixHeight));
-    const d = track.downloadables.find(d => d.pixHeight === maxHeight);
-    const url = d.urls[Object.keys(d.urls)[0]];
+  static _buildImageBased(track, lang, bcp47) { 
+    // const maxHeight = Math.max(...track.downloadables.map(d => d.pixHeight));
+    const maxHeight = track.ttDownloadables["nflx-cmisc"].height;
+    // const d = track.downloadables.find(d => d.pixHeight === maxHeight);
+    // const url = d.urls[Object.keys(d.urls)[0]];
+    const url = track.ttDownloadables["nflx-cmisc"].downloadUrls[Object.keys(track.ttDownloadables["nflx-cmisc"].downloadUrls)[0]];
     return new ImageSubtitle(lang, bcp47, url);
   }
 
   static _buildTextBased(track, lang, bcp47) {
     const targetProfile = 'dfxp-ls-sdh';
-    const d = track.downloadables.find(d => d.contentProfile === targetProfile);
+    // const d = track.downloadables.find(d => d.contentProfile === targetProfile);
+    const d = track.ttDownloadables["dfxp-ls-sdh"];
     if (!d) {
       console.error(`Cannot find "${targetProfile}" for ${lang}`);
       return null;
     }
 
-    const url = d.urls[Object.keys(d.urls)[0]];
+    // const url = d.urls[Object.keys(d.urls)[0]];
+    const url = track.ttDownloadables["dfxp-ls-sdh"].downloadUrls[Object.keys(track.ttDownloadables["dfxp-ls-sdh"].downloadUrls)[0]];
+
     return new TextSubtitle(lang, bcp47, url);
   }
 }
 
-// textTracks: manifest.textTracks
-const buildSubtitleList = textTracks => {
+// timedtexttracks: manifest.timedtexttracks
+const buildSubtitleList = timedtexttracks => {
   const dummy = new DummySubtitle();
   dummy.activate();
 
   // sorted by language in alphabetical order (to align with official UI)
-  const subs = textTracks
-    .filter(t => !t.isNone)
+  const subs = timedtexttracks
+    // .filter(t => !t.isNone)
+    // I guess it's this now:
+    .filter(t => !t.isNoneTrack)
     .map(t => SubtitleFactory.build(t))
     .sort((a, b) => a.lang.localeCompare(b.lang));
   return [dummy].concat(subs);
@@ -915,7 +926,7 @@ class NflxMultiSubsManager {
           }
 
           this.lastMovieId = manifest.movieId;
-          gSubtitles = buildSubtitleList(manifest.textTracks);
+          gSubtitles = buildSubtitleList(manifest.timedtexttracks);
 
           gSubtitleMenu = new SubtitleMenu();
           gSubtitleMenu.render();
