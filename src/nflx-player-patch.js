@@ -331,18 +331,24 @@ module.exports = {
 
     payload = 
     `
-    var JP_OLD = JSON.parse; 
-    JSON.parse = function(data){ 
-        var parsed = JP_OLD(data); 
-        if(parsed.result && parsed.result.timedtexttracks) { 
-            // window.manifests.push(parsed); 
-            ${ourName}&&${ourName}.updateManifest(parsed.result);
-        } 
-        return parsed;
-    };
-    `
-    
+    // for testing only:
+    // window.manifests = {};
 
+    // LLN will do this for both, if loaded.
+    
+    if(!window.__LLN) {
+      var JP_OLD = JSON.parse; 
+      JSON.parse = function(data) {
+          var parsed = JP_OLD(data); 
+          if(parsed.result && parsed.result.timedtexttracks) {
+              // for testing only:
+              // window.manifests[parsed.result.movieId] = parsed.result;
+              ${ourName}&&${ourName}.updateManifest(parsed.result);
+          }
+          return parsed;
+      };
+    }
+    `
     script = payload + script;
 
 /*

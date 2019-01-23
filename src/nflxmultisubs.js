@@ -15,11 +15,11 @@ let gRenderOptions = Object.assign({}, kDefaultSettings);
 ////////////////////////////////////////////////////////////////////////////////
 
 class SubtitleBase {
-  constructor(lang, bcp47, url) {
+  constructor(languageDescription, language, url) {
     this.state = 'GENESIS';
     this.active = false;
-    this.lang = lang;
-    this.bcp47 = bcp47;
+    this.language = language;
+    this.languageDescription = languageDescription;
     this.url = url;
     this.extentWidth = undefined;
     this.extentHeight = undefined;
@@ -32,10 +32,10 @@ class SubtitleBase {
       this.active = true;
       if (this.state === 'GENESIS') {
         this.state = 'LOADING';
-        console.log(`Subtitle "${this.lang}" downloading`);
+        console.log(`Subtitle "${this.languageDescription}" downloading`);
         this._download().then(() => {
           this.state = 'READY';
-          console.log(`Subtitle "${this.lang}" loaded`);
+          console.log(`Subtitle "${this.languageDescription}" loaded`);
           resolve(this);
         });
       }
@@ -290,39 +290,41 @@ class SubtitleFactory {
     // Text based are dfxp-ls-sdh or simplesdh
     // const isImageBased = track.downloadables.some(d => d["nflx-cmisc"]);
     const isImageBased = track.ttDownloadables["nflx-cmisc"];
-    const isCaption = track.trackType === 'CLOSEDCAPTIONS';
+    //const isCaption = track.trackType === 'CLOSEDCAPTIONS';
+    // fixme: check this is correct:
+    const isCaption = track.rawTrackType === 'closedcaptions';
     // These were updated in the API chnage:
-    const lang = track.languageDescription + (isCaption ? ' [CC]' : '');
-    const bcp47 = track.language;
+    const languageDescription = track.languageDescription + (isCaption ? ' [CC]' : '');
+    const language = track.language;
 
     if (isImageBased) {
-      return this._buildImageBased(track, lang, bcp47);
+      return this._buildImageBased(track, languageDescription, language);
     }
-    return this._buildTextBased(track, lang, bcp47);
+    return this._buildTextBased(track, languageDescription, language);
   }
 
-  static _buildImageBased(track, lang, bcp47) { 
+  static _buildImageBased(track, languageDescription, language) { 
     // const maxHeight = Math.max(...track.downloadables.map(d => d.pixHeight));
     const maxHeight = track.ttDownloadables["nflx-cmisc"].height;
     // const d = track.downloadables.find(d => d.pixHeight === maxHeight);
     // const url = d.urls[Object.keys(d.urls)[0]];
     const url = track.ttDownloadables["nflx-cmisc"].downloadUrls[Object.keys(track.ttDownloadables["nflx-cmisc"].downloadUrls)[0]];
-    return new ImageSubtitle(lang, bcp47, url);
+    return new ImageSubtitle(languageDescription, language, url);
   }
 
-  static _buildTextBased(track, lang, bcp47) {
+  static _buildTextBased(track, languageDescription, language) {
     const targetProfile = 'dfxp-ls-sdh';
     // const d = track.downloadables.find(d => d.contentProfile === targetProfile);
     const d = track.ttDownloadables["dfxp-ls-sdh"];
     if (!d) {
-      console.error(`Cannot find "${targetProfile}" for ${lang}`);
+      console.error(`Cannot find "${targetProfile}" for ${languageDescription}`);
       return null;
     }
 
     // const url = d.urls[Object.keys(d.urls)[0]];
     const url = track.ttDownloadables["dfxp-ls-sdh"].downloadUrls[Object.keys(track.ttDownloadables["dfxp-ls-sdh"].downloadUrls)[0]];
 
-    return new TextSubtitle(lang, bcp47, url);
+    return new TextSubtitle(languageDescription, language, url);
   }
 }
 
@@ -335,9 +337,11 @@ const buildSubtitleList = timedtexttracks => {
   const subs = timedtexttracks
     // .filter(t => !t.isNone)
     // I guess it's this now:
-    .filter(t => !t.isNoneTrack)
+    // We don't want those tracks where t.isForcedNarrative == true or t.isNone == true
+    .filter(t => ( !(t.isForcedNarrative || t.isNoneTrack) ) )
     .map(t => SubtitleFactory.build(t))
-    .sort((a, b) => a.lang.localeCompare(b.lang));
+    // fixme: sorting order seems wrong
+    .sort((a, b) => { a.languageDescription.localeCompare(b.languageDescription); });
   return [dummy].concat(subs);
 };
 
@@ -371,9 +375,9 @@ class SubtitleMenu {
       if (sub.active) {
         const icon = sub.state === 'LOADING' ? loadingIcon : checkIcon;
         item.classList.add('selected');
-        item.innerHTML = `${icon}${sub.lang}`;
+        item.innerHTML = `${icon}${sub.languageDescription}`;
       } else {
-        item.innerHTML = sub.lang;
+        item.innerHTML = sub.languageDescription;
         item.addEventListener('click', () => {
           activateSubtitle(id);
         });
@@ -932,21 +936,23 @@ class NflxMultiSubsManager {
           gSubtitleMenu.render();
 
           // select subtitle to match the default audio track
-          try {
-            const defaultAudioTrack = manifest.audioTracks.find(
-              t => manifest.defaultMedia.indexOf(t.id) >= 0
-            );
+          try { // 
+            // const defaultAudioTrack = manifest.audioTracks.find(
+            //   t => manifest.defaultMedia.indexOf(t.id) >= 0
+            // );
+            const defaultAudioTrack = manifest.audio_tracks.find(
+              t => manifest.defaultTrackOrderList[0].audioTrackId === t.id);
             if (defaultAudioTrack) {
-              const bcp47 = defaultAudioTrack.bcp47;
+              const language = defaultAudioTrack.language;
               let autoSubtitleId = gSubtitles.findIndex(
-                t => t.bcp47 === bcp47 && t.isCaption
+                t => t.language === language && t.isCaption
               );
               autoSubtitleId =
                 autoSubtitleId < 0
-                  ? gSubtitles.findIndex(t => t.bcp47 === bcp47)
+                  ? gSubtitles.findIndex(t => t.language === language)
                   : autoSubtitleId;
               if (autoSubtitleId >= 0) {
-                console.log(`Subtitle "${bcp47}" auto-enabled to match audio`);
+                console.log(`Subtitle "${language}" auto-enabled to match audio`);
                 activateSubtitle(autoSubtitleId);
               }
             }
@@ -956,7 +962,10 @@ class NflxMultiSubsManager {
 
           // retrieve video ratio
           try {
-            let { width, height } = manifest.videoTracks[0].downloadables[0];
+            // let { width, height } = manifest.video_tracks[0].downloadables[0];
+            // OK to use max values?
+            let height = manifest.video_tracks[0].maxHeight;
+            let width = manifest.video_tracks[0].maxWidth;
             gVideoRatio = height / width;
           } catch (err) {
             console.error('Video ratio not available, ', err);

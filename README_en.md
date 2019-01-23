@@ -1,11 +1,9 @@
-> Dan Chen (dannvix), the original developer, had to stop development, because of lack of time. I have made some fixes so that the extension works again.
-> [機器翻譯] 由於時間不夠，原始開發商Dan Chen（dannvix）不得不停止開發。 我做了一些修復，以便擴展再次工作。
+> **Development Discontinued**
 
-New Chome Webstore link (go here to install): https://chrome.google.com/webstore/detail/nflxmultisubs-netflix-mul/kbefmlcbiedkojoielehjmlchhccglgf
+> **This extension does not work since Netflix revise their player on 2019/01/19.  Sadly we'd like to discontinue this extension due to the cost of time, and we also removed it from the Chrome Web Store and Firefox Add-ons.  It was not a easy decision. Thank you very much for all the supports ever.  This extension is open-sourced under MIT license. Glad to see anyone improves it and make it available again.**
 
-Firefox version coming soon.
+> **PS. If you'd used this extension for langauge learning, I've come across a [Language Learning with Netflix](http://languagelearningwithnetflix.com/) project, for your reference.**
 
-Original project (原創項目): https://github.com/dannvix/NflxMultiSubs
 
 ----
 
@@ -16,6 +14,11 @@ Original project (原創項目): https://github.com/dannvix/NflxMultiSubs
 <img src="docs/icon.png?raw=true" height="48"> NflxMultiSubs
 ============================================================
 Best ever Chrome/Firefox extension to unleash bilingual subtitles on Netflix!
+
+
+[![Download on Chrome Web Store](docs/chrome-webstore-badge58.png?raw=true)](#)
+[![Download on Firefox Add-ons](docs/firefox-addons-badge58.png?raw=true)](#)
+
 
 
 Features
