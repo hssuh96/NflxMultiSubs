@@ -1,9 +1,4 @@
-> **Development Discontinued**
-
-> **This extension does not work since Netflix revise their player on 2019/01/19.  Sadly we'd like to discontinue this extension due to the cost of time, and we also removed it from the Chrome Web Store and Firefox Add-ons.  It was not a easy decision. Thank you very much for all the supports ever.  This extension is open-sourced under MIT license. Glad to see anyone improves it and make it available again.**
-
-> **PS. If you'd used this extension for langauge learning, I've come across a [Language Learning with Netflix](http://languagelearningwithnetflix.com/) project, for your reference.**
-
+> Dan Chen (dannvix), the original developer, had to stop development, because of lack of time. I have made some fixes so that the extension works again.
 
 ----
 
