@@ -1,6 +1,6 @@
-const acorn = require('acorn');
+// const acorn = require('acorn');
 const console = require('./console');
-const { patch } = require('./nflx-player-patch');
+// const { patch } = require('./nflx-player-patch');
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -10,14 +10,17 @@ const { patch } = require('./nflx-player-patch');
 let origPlayerUrl, origPlayerVersion;
 
 window.addEventListener('load', () => {
+
+
   let scriptElem = document.createElement('script');
   scriptElem.setAttribute('type', 'text/javascript');
   scriptElem.textContent = `(() => {
-      window.__originalPlayerUrl = ${JSON.stringify(origPlayerUrl)};
-      window.__originalPlayerVersion = ${JSON.stringify(origPlayerVersion)};
+     // window.__originalPlayerUrl = ${JSON.stringify(origPlayerUrl)};
+     //  window.__originalPlayerVersion = ${JSON.stringify(origPlayerVersion)};
       window.__nflxMultiSubsExtId = ${JSON.stringify(chrome.runtime.id)};
     })();`;
   document.body.appendChild(scriptElem);
+
 
   const scriptsToInject = ['nflxmultisubs.min.js'];
   scriptsToInject.forEach(scriptName => {
@@ -32,7 +35,7 @@ window.addEventListener('load', () => {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
+/*
 function mutateUrl(url) {
   const u = new URL(url);
   const doubleSlashPath = u.pathname.replace(/\//g, '//');
@@ -41,8 +44,9 @@ function mutateUrl(url) {
   const mutatedUrl = `${u.protocol}\/\/:@${u.host}${port}${encodedPath}#`;
   return mutatedUrl;
 }
+*/
 
-
+/*
 const observer = new MutationObserver(mutations => {
   mutations.forEach(mutation => {
     mutation.addedNodes.forEach(node => {
@@ -127,7 +131,7 @@ const observer = new MutationObserver(mutations => {
 });
 const options = { subtree: true, childList: true, };
 observer.observe(document, options);
-
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 

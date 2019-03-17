@@ -5,6 +5,46 @@ const PlaybackRateController = require('./playback-rate-controller');
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// If Netflix 1080p is loaded, it disables the required Netlflix subs format.
+
+var JP_OLD_NMS = JSON.parse; 
+JSON.parse = function(data, reviver) {
+    var parsed = JP_OLD_NMS(data, reviver); 
+    if(parsed.result && parsed.result.timedtexttracks) {
+        window.__NflxMultiSubs&&window.__NflxMultiSubs.updateManifest(parsed.result);
+        // window.nfmanifest = parsed.result;
+    }
+    return parsed;
+};
+
+// This is to counter Netflix 1080p extension
+var profilesToAdd = [
+  "dfxp-ls-sdh",
+  "simplesdh",
+  "nflx-cmisc",
+  "heaac-2-dash",
+  "BIF240",
+  "BIF320"
+];
+
+var JS_OLD_NMS = JSON.stringify;
+
+JSON.stringify = function(data, replacer, space) { 
+
+if(data.params && data.params.showAllSubDubTracks !== undefined) {
+    data.params.showAllSubDubTracks = true;
+
+    for(var i =0; i < profilesToAdd.length; i++) {
+        if(!data.params.profiles.includes(profilesToAdd[i])) {
+          data.params.profiles.push(profilesToAdd[i]);
+        }
+    }
+}
+
+var stringed = JS_OLD_NMS(data, replacer, space); 
+return stringed; 
+};
+
 // global states
 let gSubtitles = [],
   gSubtitleMenu;
@@ -873,6 +913,7 @@ class NflxMultiSubsManager {
       }
     }
 
+/*
     // player actually loaded could be different to the `<script>` one
     // (the loaded one may come from other extension)
     try {
@@ -889,6 +930,7 @@ class NflxMultiSubsManager {
     } catch (err) {
       console.warn('Error:', err);
     }
+*/
 
     try {
       console.log(`Manifest: ${manifest.movieId}`);

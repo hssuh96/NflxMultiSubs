@@ -349,7 +349,7 @@ module.exports = {
       };
     }
     `
-    script = payload + script;
+    // script = payload + script;
 
 /*
     let patched = injectCallback(script);

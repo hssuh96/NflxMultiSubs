@@ -1,0 +1,11 @@
+.def {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 400px;
+    padding: 0 15px 22px !important;
+    margin: 0 !important;
+}
+.popup-content.audio-subtitle-controller > .track-list {
+    max-height: 360px;
+    overflow-y: auto;
+}

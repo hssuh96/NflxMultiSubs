@@ -1,6 +1,7 @@
 const kDefaultSettings = require('./default-settings');
 
 
+/*
 chrome.webRequest.onBeforeRequest.addListener(details => {
   console.log(`Denying: ${details.url}`);
   return { cancel: true, };
@@ -10,7 +11,7 @@ chrome.webRequest.onBeforeRequest.addListener(details => {
   types: ['script'],
 },
 ['blocking']);
-
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 
