@@ -9,3 +9,8 @@
     max-height: 360px;
     overflow-y: auto;
 }
+
+.track-list-subtitles ul, .track-list-audio ul {
+    overflow-y: visible !important;
+    max-height: none !important;
+}
