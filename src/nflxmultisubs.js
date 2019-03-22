@@ -393,8 +393,8 @@ function getLlnTipText(){
   let currentTime = (new Date()).getTime();
   // get time lln message was last hidden from storage (or 0 if none)
   let hideLlnTime = parseInt(localStorage.getItem('hide-lln-in-menu') || 0);
-  // if message was hidden more than 2 days ago, show it again
-  if (currentTime > hideLlnTime + 1000 * 3600 * 48) {
+  // if message was hidden more than 7 days ago, show it again
+  if (currentTime > hideLlnTime + 1000 * 3600 * 24 * 7) {
       let lln_text = `Are you learning a language? Try our new extension for studying a language with Netflix.`;
       let lln_translations = {
           fr: `Est-ce que vous apprenez une langue?  Essayez notre nouvelle extension pour étudier une langue avec Netflix.`,
