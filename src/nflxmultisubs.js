@@ -698,7 +698,11 @@ class PrimaryTextTransformer {
         top: auto !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-      }`;
+      }
+      .player-timedtext-text-container + .player-timedtext-text-container {
+        bottom: 4% !important;
+      }
+      `;
   }
 }
 

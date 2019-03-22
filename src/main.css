@@ -24,7 +24,7 @@
 }
 
 .player-timedtext {
-    transform: translateY(-8vw) !important;
+    transform: translateY(-10vw) !important;
 }
 
 .image-based-timed-text > svg {
