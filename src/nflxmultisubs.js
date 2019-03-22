@@ -240,6 +240,7 @@ class TextSubtitle extends SubtitleBase {
     text.style.fontFamily = 'Arial, Helvetica';
     text.style.fill = 'white';
     text.style.stroke = 'black';
+    text.style.textShadow = '1px 1px 3px rgba(0,0,0,.4)';
     text.textContent = textContent;
     return [text];
   }
