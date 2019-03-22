@@ -9,8 +9,7 @@ const console = require('./console');
 // updated when we got `<script src...>` in the observer
 let origPlayerUrl, origPlayerVersion;
 
-window.addEventListener('load', () => {
-
+window.addEventListener('DOMContentLoaded', () => {
 
   let scriptElem = document.createElement('script');
   scriptElem.setAttribute('type', 'text/javascript');

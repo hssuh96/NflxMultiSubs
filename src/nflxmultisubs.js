@@ -12,7 +12,6 @@ JSON.parse = function(data, reviver) {
     var parsed = JP_OLD_NMS(data, reviver); 
     if(parsed && parsed.result && parsed.result.timedtexttracks) {
         window.__NflxMultiSubs&&window.__NflxMultiSubs.updateManifest(parsed.result);
-        // window.nfmanifest = parsed.result;
     }
     return parsed;
 };
@@ -34,15 +33,16 @@ JSON.stringify = function(data, replacer, space) {
 if(data && data.params && data.params.showAllSubDubTracks !== undefined) {
     data.params.showAllSubDubTracks = true;
 
-    for(var i =0; i < profilesToAdd.length; i++) {
-        if(!data.params.profiles.includes(profilesToAdd[i])) {
-          data.params.profiles.push(profilesToAdd[i]);
-        }
+    if(data.params.profiles) {
+      for(var i =0; i < profilesToAdd.length; i++) {
+          if(!data.params.profiles.includes(profilesToAdd[i])) {
+            data.params.profiles.push(profilesToAdd[i]);
+          }
+      }
     }
 }
 
-var stringed = JS_OLD_NMS(data, replacer, space); 
-return stringed; 
+return JS_OLD_NMS(data, replacer, space);
 };
 
 // global states
