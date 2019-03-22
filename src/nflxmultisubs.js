@@ -387,6 +387,54 @@ const buildSubtitleList = timedtexttracks => {
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// generate message that leads to LLN extension
+function getLlnTipText(){
+  // check if message should be shown
+  let currentTime = (new Date()).getTime();
+  // get time lln message was last hidden from storage (or 0 if none)
+  let hideLlnTime = parseInt(localStorage.getItem('hide-lln-in-menu') || 0);
+  // if message was hidden more than 2 days ago, show it again
+  if (currentTime > hideLlnTime + 1000 * 3600 * 48) {
+      let lln_text = `Are you learning a language? Try our new extension for studying a language with Netflix.`;
+      let lln_translations = {
+          fr: `Est-ce que vous apprenez une langue?  Essayez notre nouvelle extension pour étudier une langue avec Netflix.`,
+          es: `¿Está aprendiendo un idioma? Pruebe nuestra nueva extensión para estudiar un idioma con Netflix.`,
+          pt: `Você está aprendendo um idioma? Experimente nossa nova extensão para estudar um idioma com a Netflix`,
+          it: `Stai studiando una lingua? Prova la nostra nuova estensione per studiare una lingua con Netflix.`,
+          pl: `Uczysz się języka? Wypróbuj nasze nowe rozszerzenie do nauki języka z Netflix.`,
+          tr: `Dil mi öğreniyorsunuz? Yepyeni Netlifx eklentimiz ile dil öğrenin.`,
+          th: `คุณกำลังศึกษาภาษาอยู่ใช่ไหม? ลอง Extension ใหม่ของเราเพื่อใช้เรียนรู้ภาษาควบคู่กับ Netflix`,
+          ko: `언어를 공부하고 계신가요? 넷플릭스 영상들과 함께 언어를 공부하는 저희 익스텐션을 사용해보세요!`,
+          ja: `外国語を学習していますか？Netflixの新しい言語学習機能をお試し下さい`,
+          ru: `Вы изучаете язык? Попробуйте наше новое расширение для изучения языка с Netflix.`,
+          de: `Lernst du eine Sprache? Probieren Sie unsere neue Erweiterung zum Lernen einer Sprache mit Netflix aus.`,
+          hi: `क्या आप कोई भाषा सीख रहे हैं? नेटफ्लिक्स के साथ एक भाषा का अध्ययन करने के लिए हमारे नए विस्तार को आजमायें।`,
+          hu: `Tanulsz valamilyen nyelven? Próbáld ki új bővítményünket, hogy a Netflix segítségével fejleszthesd tudásod!`,
+          sr: `Učite jezike? Isprobajte našu novu ekstenziju za učenje jezika na Netflixu.`,
+          zh: `您在學習語言嗎？試試我們的新擴充套件和 Netflix 一起學語言。`
+      };
+      // get localized text
+      if (window.navigator.language && window.navigator.language.length >= 2) {
+          let lang = window.navigator.language.slice(0, 2);
+          if (lln_translations.hasOwnProperty(lang)) {
+              lln_text = lln_translations[lang];
+          }
+      }
+      return `<li class="lln-tip">
+          <a style="width: 100%;" href="https://chrome.google.com/webstore/detail/language-learning-with-ne/hoombieeljmmljlkjmnheibnpciblicm" target="_blank">`
+          + lln_text +
+          `</a>
+      <a href="#" class="lln-tip-hide" title="Hide" 
+  onclick="event.preventDefault(); localStorage.setItem('hide-lln-in-menu', (new Date()).getTime().toString()); this.parentNode.remove(); ">X</a>
+          </li>`
+  } else {
+    // message shouldn't be shown. return empty string.
+    return ``;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 const SUBTITLE_LIST_CLASSNAME = 'nflxmultisubs-subtitle-list';
 class SubtitleMenu {
   constructor() {
@@ -409,6 +457,10 @@ class SubtitleMenu {
       </svg></span>`;
 
     this.elem.innerHTML = `<li class="list-header">Secondary Subtitles</li>`;
+
+    // add LLN extension message
+    this.elem.innerHTML += getLlnTipText();
+
     gSubtitles.forEach((sub, id) => {
       let item = document.createElement('li');
       item.classList.add('track');
@@ -627,26 +679,25 @@ class PrimaryTextTransformer {
       }`;
     style.textContent = styleText;
 
-    const rect = divElem.getBoundingClientRect();
-    const [extentWidth, extentHeight] = [rect.width, rect.height];
+    // const rect = divElem.getBoundingClientRect();
+    // const [extentWidth, extentHeight] = [rect.width, rect.height];
 
-    const lowerBaseline = extentHeight * options.lowerBaselinePos;
-    const { left, top, width, height } = container.getBoundingClientRect();
-    const newLeft = extentWidth * 0.5 - width * 0.5;
-    let newTop = lowerBaseline - height;
+    // const lowerBaseline = extentHeight * options.lowerBaselinePos;
+    // const { left, top, width, height } = container.getBoundingClientRect();
+    // const newLeft = extentWidth * 0.5 - width * 0.5;
+    // let newTop = lowerBaseline - height;
 
-    // FIXME: dirty transform & magic offets
-    // we out run the official player, so the primary text-based subtitles
-    // does not move automatically when the navs are active
-    newTop += controlsActive ? -120 : 0;
+    // CHANGED: sub position is now fixed
 
     style.textContent =
       styleText +
       '\n' +
       `
       .player-timedtext-text-container {
-        top: ${newTop}px !important;
-        left: ${newLeft}px !important;
+        bottom: 10% !important;
+        top: auto !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
       }`;
   }
 }
@@ -716,10 +767,7 @@ class RendererLoop {
 
     // render secondary subtitles
     // ---------------------------------------------------------------------
-    // FIXME: dirty transform & magic offets
-    // this leads to a big gap between primary & secondary subtitles
-    // when the progress bar is shown
-    this.subtitleWrapperElem.style.top = controlsActive ? '-100px' : '0';
+    this.subtitleWrapperElem.style.top = '0';
 
     // everything rendered, clear the dirty bit with ease
     this.isRenderDirty = false;

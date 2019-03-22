@@ -14,3 +14,50 @@
     overflow-y: visible !important;
     max-height: none !important;
 }
+
+.image-based-timed-text {
+    bottom: 0 !important;
+}
+
+.nflxmultisubs-subtitle-svg {
+    transform: translateY(-3.5vw) !important;
+}
+
+.player-timedtext {
+    transform: translateY(-8vw) !important;
+}
+
+.image-based-timed-text > svg {
+    transform: translateY(-5vw) !important;
+}
+
+.lln-tip {
+    background: #575757 !important;
+    color: white !important;
+    padding-left: 1.5em !important;
+    padding-right: 2.5em !important;
+    box-sizing: border-box;
+    white-space: normal !important;
+}
+
+.lln-tip:hover {
+    background: #6c6c6c !important;
+}
+
+.lln-tip a {
+    display: inline-block;
+    max-width: 17em;
+}
+.lln-tip-hide {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    padding: 5px;
+    transform: scaleX(1.2);
+    display: inline-block;
+    opacity: .75;
+}
+
+.lln-tip-hide:hover {
+    opacity: 1;
+}
