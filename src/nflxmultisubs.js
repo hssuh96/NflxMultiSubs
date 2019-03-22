@@ -991,10 +991,13 @@ class NflxMultiSubsManager {
     this.busyWaitVideoElement()
       .then(video => {
         try {
+
           const movieIdInUrl = /^\/watch\/(\d+)/.exec(
             window.location.pathname
           )[1];
+
           console.log(`Note: movieIdInUrl=${movieIdInUrl}`);
+          
           let playingManifest = manifest.movieId.toString() === movieIdInUrl;
 
           if (!playingManifest) {
