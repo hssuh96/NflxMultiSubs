@@ -5,14 +5,35 @@ const PlaybackRateController = require('./playback-rate-controller');
 
 ////////////////////////////////////////////////////////////////////////////////
 
+console.log("HELLO FROM NMS");
+
 // If Netflix 1080p is loaded, it disables the required Netlflix subs format.
 
-var JP_OLD_NMS = JSON.parse; 
+window.__NMSManifests = [];
+
+var JP_OLD_NMS = JSON.parse;
+
 JSON.parse = function(data, reviver) {
-    var parsed = JP_OLD_NMS(data, reviver); 
+  
+    var parsed = JP_OLD_NMS(data, reviver);
+  
     if(parsed && parsed.result && parsed.result.timedtexttracks) {
-        window.__NflxMultiSubs&&window.__NflxMultiSubs.updateManifest(parsed.result);
+
+      console.log(`SAW MANIFEST ${parsed.result.movieId}`);
+
+        if (!window.__NMSManifests.find(m => m.movieId === parsed.result.movieId)) {
+          window.__NMSManifests.push(parsed.result);
+          console.log(`CAUGHT MANIFEST ${parsed.result.movieId}`);
+          console.log("Manifests: ");
+          console.log(window.__NMSManifests);
+        }
+
+        // Returns straight away if not in /watch
+        if(window.__NflxMultiSubs && window.__NflxMultiSubs.updateManifest) {
+          window.__NflxMultiSubs.updateManifest();
+        }
     }
+
     return parsed;
 };
 
@@ -44,6 +65,26 @@ if(data && data.params && data.params.showAllSubDubTracks !== undefined) {
 
 return JS_OLD_NMS(data, replacer, space);
 };
+
+window.__NMSLastMovieId = undefined;
+
+var oldHREF = undefined;
+
+setInterval(function() {
+  if(window.location.href != oldHREF) {
+    oldHREF = window.location.href;
+    console.log('Hash changed, invalidating window.__NMSLastMovieId.');
+    // Force a reload
+    window.__NMSLastMovieId = undefined;
+  }
+}, 100);
+
+setTimeout(function() {
+    // Returns straight away if not in /watch
+    if(window.__NflxMultiSubs && window.__NflxMultiSubs.updateManifest) {
+      window.__NflxMultiSubs.updateManifest();
+    }
+}, 500);
 
 // global states
 let gSubtitles = [],
@@ -897,11 +938,11 @@ window.addEventListener('resize', evt => {
 
 class NflxMultiSubsManager {
   constructor() {
-    this.lastMovieId = undefined;
+    // this.lastMovieId = undefined;
     this.playerUrl = undefined;
     this.playerVersion = undefined;
     this.busyWaitTimeout = 100000; // ms
-    this.manifestList = [];
+
   }
 
   busyWaitVideoElement() {
@@ -922,12 +963,11 @@ class NflxMultiSubsManager {
     });
   }
 
-  updateManifest(manifest) {
-    const isInPlayerPage = /netflix\.com\/watch/i.test(window.location.href);
-    if (!isInPlayerPage) return;
+  updateManifest() {
 
-    if (!this.manifestList.find(m => m.movieId === manifest.movieId)) {
-      this.manifestList.push(manifest);
+    const isInPlayerPage = /netflix\.com\/watch/i.test(window.location.href);
+    if (!isInPlayerPage) {
+      return;
     }
 
     // connect with background script
@@ -965,37 +1005,12 @@ class NflxMultiSubsManager {
       }
     }
 
-/*
-    // player actually loaded could be different to the `<script>` one
-    // (the loaded one may come from other extension)
-    try {
-      const originalPlayerVersion = window.__originalPlayerVersion;
-      const loadedPlayerVersion = window.netflix.player.getVersion();
-      console.log(`Player: loaded=${loadedPlayerVersion}`);
-
-      if (loadedPlayerVersion !== originalPlayerVersion) {
-        console.warn(
-          `Unoffcial player detected:`,
-          `presumed=${originalPlayerVersion}, loaded=${loadedPlayerVersion}`
-        );
-      }
-    } catch (err) {
-      console.warn('Error:', err);
-    }
-*/
-
-    try {
-      console.log(`Manifest: ${manifest.movieId}`);
-    } catch (err) {
-      console.warn('Error:', err);
-    }
-
     // Sometime the movieId in URL may be different to the actually playing manifest
     // Thus we also need to check the player DOM tree...
     this.busyWaitVideoElement()
       .then(video => {
         try {
-
+/*
           const movieIdInUrl = /^\/watch\/(\d+)/.exec(
             window.location.pathname
           )[1];
@@ -1003,30 +1018,34 @@ class NflxMultiSubsManager {
           console.log(`Note: movieIdInUrl=${movieIdInUrl}`);
           
           let playingManifest = manifest.movieId.toString() === movieIdInUrl;
+*/
 
-          if (!playingManifest) {
-            // magic! ... div.VideoContainer > div#12345678 > video[src=blob:...]
-            const movieIdInPlayerNode = video.parentNode.id;
-            console.log(`Note: movieIdInPlayerNode=${movieIdInPlayerNode}`);
-            playingManifest = movieIdInPlayerNode.includes(
-              manifest.movieId.toString()
-            );
-          }
+          // magic! ... div.VideoContainer > div#12345678 > video[src=blob:...]
+          const movieIdInPlayerNode = video.parentNode.id;
+          console.log(`Note: movieIdInPlayerNode=${movieIdInPlayerNode}`);
 
-          if (!playingManifest) {
-            console.log(`Ignored: manifest ${manifest.movieId} not playing`);
-            // Ignore but store it.
-            this.manifestList.push(manifest);
-            return;
-          }
-
-          const movieChanged = manifest.movieId !== this.lastMovieId;
+          const movieChanged = movieIdInPlayerNode !== window.__NMSLastMovieId;
           if (!movieChanged) {
-            console.log(`Ignored: manifest ${manifest.movieId} loaded yet`);
+            console.log(`updateManifest: Movie didn't change, returning. lastMovieId: ${window.__NMSLastMovieId}.`);
             return;
           }
 
-          this.lastMovieId = manifest.movieId;
+          console.log(`updateManifest: Movie changed, setting up new stuff.`);
+
+          const found = window.__NMSManifests.find(
+            manifest => manifest.movieId.toString() === movieIdInPlayerNode
+          );
+          if (found) {
+            console.log('Found required manifest.');
+          } else {
+            console.error("Didn't find required manifest.");
+            return;
+          }
+
+          var manifest = found;
+
+          // fixme: goes before or after?
+          window.__NMSLastMovieId = movieIdInPlayerNode;
           gSubtitles = buildSubtitleList(manifest.timedtexttracks);
 
           gSubtitleMenu = new SubtitleMenu();
@@ -1099,8 +1118,10 @@ class NflxMultiSubsManager {
     const isInPlayerPage = /netflix\.com\/watch/i.test(window.location.href);
     if (!isInPlayerPage) return;
 
+    this.updateManifest();
+/*
     const manifestInUrl = /^\/watch\/(\d+)/.exec(window.location.pathname)[1];
-    const found = this.manifestList.find(
+    const found = window.__NMSManifests.find(
       manifest => manifest.movieId.toString() === manifestInUrl
     );
     if (found) {
@@ -1109,6 +1130,7 @@ class NflxMultiSubsManager {
     } else {
       console.error('rendererLoop destroyed but no valid manifest.');
     }
+*/
   }
 }
 window.__NflxMultiSubs = new NflxMultiSubsManager();

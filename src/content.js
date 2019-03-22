@@ -20,7 +20,6 @@ window.addEventListener('DOMContentLoaded', () => {
     })();`;
   document.body.appendChild(scriptElem);
 
-
   const scriptsToInject = ['nflxmultisubs.min.js'];
   scriptsToInject.forEach(scriptName => {
     const scriptElem = document.createElement('script');
