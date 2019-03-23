@@ -437,22 +437,22 @@ function getLlnTipText(){
   let hideLlnTime = parseInt(localStorage.getItem('hide-lln-in-menu') || 0);
   // if message was hidden more than 7 days ago, show it again
   if (currentTime > hideLlnTime + 1000 * 3600 * 24 * 7) {
-      let lln_text = `Are you learning a language? Try our new extension for studying a language with Netflix.`;
+      let lln_text = `Are you learning a language? Try our new extension for studying a language with Netflix`;
       let lln_translations = {
-          fr: `Est-ce que vous apprenez une langue?  Essayez notre nouvelle extension pour étudier une langue avec Netflix.`,
-          es: `¿Está aprendiendo un idioma? Pruebe nuestra nueva extensión para estudiar un idioma con Netflix.`,
+          fr: `Est-ce que vous apprenez une langue?  Essayez notre nouvelle extension pour étudier une langue avec Netflix`,
+          es: `¿Está aprendiendo un idioma? Pruebe nuestra nueva extensión para estudiar un idioma con Netflix`,
           pt: `Você está aprendendo um idioma? Experimente nossa nova extensão para estudar um idioma com a Netflix`,
-          it: `Stai studiando una lingua? Prova la nostra nuova estensione per studiare una lingua con Netflix.`,
-          pl: `Uczysz się języka? Wypróbuj nasze nowe rozszerzenie do nauki języka z Netflix.`,
-          tr: `Dil mi öğreniyorsunuz? Yepyeni Netlifx eklentimiz ile dil öğrenin.`,
+          it: `Stai studiando una lingua? Prova la nostra nuova estensione per studiare una lingua con Netflix`,
+          pl: `Uczysz się języka? Wypróbuj nasze nowe rozszerzenie do nauki języka z Netflix`,
+          tr: `Dil mi öğreniyorsunuz? Yepyeni Netlifx eklentimiz ile dil öğrenin`,
           th: `คุณกำลังศึกษาภาษาอยู่ใช่ไหม? ลอง Extension ใหม่ของเราเพื่อใช้เรียนรู้ภาษาควบคู่กับ Netflix`,
           ko: `언어를 공부하고 계신가요? 넷플릭스 영상들과 함께 언어를 공부하는 저희 익스텐션을 사용해보세요!`,
           ja: `外国語を学習していますか？Netflixの新しい言語学習機能をお試し下さい`,
-          ru: `Вы изучаете язык? Попробуйте наше новое расширение для изучения языка с Netflix.`,
-          de: `Lernst du eine Sprache? Probieren Sie unsere neue Erweiterung zum Lernen einer Sprache mit Netflix aus.`,
+          ru: `Вы изучаете язык? Попробуйте наше новое расширение для изучения языка с Netflix`,
+          de: `Lernst du eine Sprache? Probieren Sie unsere neue Erweiterung zum Lernen einer Sprache mit Netflix aus`,
           hi: `क्या आप कोई भाषा सीख रहे हैं? नेटफ्लिक्स के साथ एक भाषा का अध्ययन करने के लिए हमारे नए विस्तार को आजमायें।`,
           hu: `Tanulsz valamilyen nyelven? Próbáld ki új bővítményünket, hogy a Netflix segítségével fejleszthesd tudásod!`,
-          sr: `Učite jezike? Isprobajte našu novu ekstenziju za učenje jezika na Netflixu.`,
+          sr: `Učite jezike? Isprobajte našu novu ekstenziju za učenje jezika na Netflixu`,
           zh: `您在學習語言嗎？試試我們的新擴充套件和 Netflix 一起學語言。`
       };
       // get localized text
@@ -465,7 +465,7 @@ function getLlnTipText(){
       return `<li class="lln-tip">
           <a style="width: 100%;" href="https://chrome.google.com/webstore/detail/language-learning-with-ne/hoombieeljmmljlkjmnheibnpciblicm" target="_blank">`
           + lln_text +
-          `</a>
+          ` ↗</a>
       <a href="#" class="lln-tip-hide" title="Hide" 
   onclick="event.preventDefault(); localStorage.setItem('hide-lln-in-menu', (new Date()).getTime().toString()); this.parentNode.remove(); ">X</a>
           </li>`
