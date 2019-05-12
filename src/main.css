@@ -15,21 +15,21 @@
     max-height: none !important;
 }
 
-.image-based-timed-text {
-    bottom: 0 !important;
-}
+/*.image-based-timed-text {*/
+/*    bottom: 0 !important;*/
+/*}*/
 
 .nflxmultisubs-subtitle-svg {
     transform: translateY(-3.5vw) !important;
 }
 
-.player-timedtext {
-    transform: translateY(-10vw) !important;
-}
+/*.player-timedtext {*/
+/*    transform: translateY(-10vw) !important;*/
+/*}*/
 
-.image-based-timed-text > svg {
-    transform: translateY(-5vw) !important;
-}
+/*.image-based-timed-text > svg {*/
+/*    transform: translateY(-5vw) !important;*/
+/*}*/
 
 .lln-tip {
     background: #575757 !important;

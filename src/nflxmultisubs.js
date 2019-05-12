@@ -238,6 +238,7 @@ class TextSubtitle extends SubtitleBase {
     text.setAttributeNS(null, 'opacity', options.secondaryTextOpacity);
     text.style.fontSize = `${fontSize * options.secondaryTextScale}px`;
     text.style.fontFamily = 'Arial, Helvetica';
+    text.style.fontWeight = 'bold';
     text.style.fill = 'white';
     text.style.stroke = 'black';
     text.style.textShadow = '1px 1px 3px rgba(0,0,0,.4)';
@@ -606,69 +607,69 @@ class PrimaryImageTransformer {
   constructor() {}
 
   transform(svgElem, controlsActive, forced) {
-    const selector = forced ? 'image' : 'image:not(.nflxmultisubs-scaled)';
-    const images = svgElem.querySelectorAll(selector);
-    if (images.length > 0) {
-      const viewBox = svgElem.getAttributeNS(null, 'viewBox');
-      const [extentWidth, extentHeight] = viewBox
-        .split(' ')
-        .slice(-2)
-        .map(n => parseInt(n));
-
-      // TODO: if there's no secondary subtitle, center the primary on baseline
-      const options = gRenderOptions;
-      const centerLine = extentHeight * 0.5;
-      const upperBaseline = extentHeight * options.upperBaselinePos;
-      const lowerBaseline = extentHeight * options.lowerBaselinePos;
-      const scale = options.primaryImageScale;
-      const opacity = options.primaryImageOpacity;
-
-      [].forEach.call(images, img => {
-        img.classList.add('nflxmultisubs-scaled');
-        const left = parseInt(
-          img.getAttributeNS(null, 'data-orig-x') ||
-            img.getAttributeNS(null, 'x')
-        );
-        const top = parseInt(
-          img.getAttributeNS(null, 'data-orig-y') ||
-            img.getAttributeNS(null, 'y')
-        );
-        const width = parseInt(
-          img.getAttributeNS(null, 'data-orig-width') ||
-            img.getAttributeNS(null, 'width')
-        );
-        const height = parseInt(
-          img.getAttributeNS(null, 'data-orig-height') ||
-            img.getAttributeNS(null, 'height')
-        );
-
-        const attribs = [
-          ['x', left],
-          ['y', top],
-          ['width', width],
-          ['height', height]
-        ];
-        attribs.forEach(p => {
-          const attrName = `data-orig-${p[0]}`,
-            attrValue = p[1];
-          if (!img.getAttributeNS(null, attrName)) {
-            img.setAttributeNS(null, attrName, attrValue);
-          }
-        });
-
-        const [newWidth, newHeight] = [width * scale, height * scale];
-        const newLeft = left + 0.5 * (width - newWidth);
-        const newTop =
-          top <= centerLine
-            ? upperBaseline - newHeight
-            : lowerBaseline - newHeight;
-        img.setAttributeNS(null, 'width', newWidth);
-        img.setAttributeNS(null, 'height', newHeight);
-        img.setAttributeNS(null, 'x', newLeft);
-        img.setAttributeNS(null, 'y', newTop);
-        img.setAttributeNS(null, 'opacity', opacity);
-      });
-    }
+    // const selector = forced ? 'image' : 'image:not(.nflxmultisubs-scaled)';
+    // const images = svgElem.querySelectorAll(selector);
+    // if (images.length > 0) {
+    //   const viewBox = svgElem.getAttributeNS(null, 'viewBox');
+    //   const [extentWidth, extentHeight] = viewBox
+    //     .split(' ')
+    //     .slice(-2)
+    //     .map(n => parseInt(n));
+    //
+    //   // TODO: if there's no secondary subtitle, center the primary on baseline
+    //   const options = gRenderOptions;
+    //   const centerLine = extentHeight * 0.5;
+    //   const upperBaseline = extentHeight * options.upperBaselinePos;
+    //   const lowerBaseline = extentHeight * options.lowerBaselinePos;
+    //   const scale = options.primaryImageScale;
+    //   const opacity = options.primaryImageOpacity;
+    //
+    //   [].forEach.call(images, img => {
+    //     img.classList.add('nflxmultisubs-scaled');
+    //     const left = parseInt(
+    //       img.getAttributeNS(null, 'data-orig-x') ||
+    //         img.getAttributeNS(null, 'x')
+    //     );
+    //     const top = parseInt(
+    //       img.getAttributeNS(null, 'data-orig-y') ||
+    //         img.getAttributeNS(null, 'y')
+    //     );
+    //     const width = parseInt(
+    //       img.getAttributeNS(null, 'data-orig-width') ||
+    //         img.getAttributeNS(null, 'width')
+    //     );
+    //     const height = parseInt(
+    //       img.getAttributeNS(null, 'data-orig-height') ||
+    //         img.getAttributeNS(null, 'height')
+    //     );
+    //
+    //     const attribs = [
+    //       ['x', left],
+    //       ['y', top],
+    //       ['width', width],
+    //       ['height', height]
+    //     ];
+    //     attribs.forEach(p => {
+    //       const attrName = `data-orig-${p[0]}`,
+    //         attrValue = p[1];
+    //       if (!img.getAttributeNS(null, attrName)) {
+    //         img.setAttributeNS(null, attrName, attrValue);
+    //       }
+    //     });
+    //
+    //     const [newWidth, newHeight] = [width * scale, height * scale];
+    //     const newLeft = left + 0.5 * (width - newWidth);
+    //     const newTop =
+    //       top <= centerLine
+    //         ? upperBaseline - newHeight
+    //         : lowerBaseline - newHeight;
+    //     img.setAttributeNS(null, 'width', newWidth);
+    //     img.setAttributeNS(null, 'height', newHeight);
+    //     img.setAttributeNS(null, 'x', newLeft);
+    //     img.setAttributeNS(null, 'y', newTop);
+    //     img.setAttributeNS(null, 'opacity', opacity);
+    //   });
+    // }
   }
 }
 
@@ -678,73 +679,73 @@ class PrimaryTextTransformer {
   }
 
   transform(divElem, controlsActive, forced) {
-    let parentNode = divElem.parentNode;
-    if (!parentNode.classList.contains('nflxmultisubs-primary-wrapper')) {
-      // let's use `<style>` + `!imporant` to outrun the offical player...
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('nflxmultisubs-primary-wrapper');
-      wrapper.style =
-        'position:absolute; width:100%; height:100%; top:0; left:0;';
-
-      const styleElem = document.createElement('style');
-      wrapper.appendChild(styleElem);
-
-      // wrap the offical text-based subtitle container, hehe!
-      parentNode.insertBefore(wrapper, divElem);
-      wrapper.appendChild(divElem);
-      parentNode = wrapper;
-    }
-
-    const container = divElem.querySelector('.player-timedtext-text-container');
-    if (!container) return;
-
-    const textContent = container.textContent;
-    if (this.lastScaledPrimaryTextContent === textContent && !forced) return;
-    this.lastScaledPrimaryTextContent = textContent;
-
-    const style = parentNode.querySelector('style');
-    if (!style) return;
-
-    const textSpan = container.querySelector('span');
-    if (!textSpan) return;
-
-    const fontSize = parseInt(textSpan.style.fontSize);
-    if (!fontSize) return;
-
-    const options = gRenderOptions;
-    const opacity = options.primaryTextOpacity;
-    const scale = options.primaryTextScale;
-    const newFontSize = fontSize * scale;
-    const styleText = `.player-timedtext-text-container span {
-        font-size: ${newFontSize}px !important;
-        opacity: ${opacity};
-      }`;
-    style.textContent = styleText;
-
-    // const rect = divElem.getBoundingClientRect();
-    // const [extentWidth, extentHeight] = [rect.width, rect.height];
-
-    // const lowerBaseline = extentHeight * options.lowerBaselinePos;
-    // const { left, top, width, height } = container.getBoundingClientRect();
-    // const newLeft = extentWidth * 0.5 - width * 0.5;
-    // let newTop = lowerBaseline - height;
-
-    // CHANGED: sub position is now fixed
-
-    style.textContent =
-      styleText +
-      '\n' +
-      `
-      .player-timedtext-text-container {
-        bottom: 10% !important;
-        top: auto !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-      }
-      .player-timedtext-text-container + .player-timedtext-text-container {
-        bottom: 4% !important;
-      }
-      `;
+    // let parentNode = divElem.parentNode;
+    // if (!parentNode.classList.contains('nflxmultisubs-primary-wrapper')) {
+    //   // let's use `<style>` + `!imporant` to outrun the offical player...
+    //   const wrapper = document.createElement('div');
+    //   wrapper.classList.add('nflxmultisubs-primary-wrapper');
+    //   wrapper.style =
+    //     'position:absolute; width:100%; height:100%; top:0; left:0;';
+    //
+    //   const styleElem = document.createElement('style');
+    //   wrapper.appendChild(styleElem);
+    //
+    //   // wrap the offical text-based subtitle container, hehe!
+    //   parentNode.insertBefore(wrapper, divElem);
+    //   wrapper.appendChild(divElem);
+    //   parentNode = wrapper;
+    // }
+    //
+    // const container = divElem.querySelector('.player-timedtext-text-container');
+    // if (!container) return;
+    //
+    // const textContent = container.textContent;
+    // if (this.lastScaledPrimaryTextContent === textContent && !forced) return;
+    // this.lastScaledPrimaryTextContent = textContent;
+    //
+    // const style = parentNode.querySelector('style');
+    // if (!style) return;
+    //
+    // const textSpan = container.querySelector('span');
+    // if (!textSpan) return;
+    //
+    // const fontSize = parseInt(textSpan.style.fontSize);
+    // if (!fontSize) return;
+    //
+    // const options = gRenderOptions;
+    // const opacity = options.primaryTextOpacity;
+    // const scale = options.primaryTextScale;
+    // const newFontSize = fontSize * scale;
+    // const styleText = `.player-timedtext-text-container span {
+    //     font-size: ${newFontSize}px !important;
+    //     opacity: ${opacity};
+    //   }`;
+    // style.textContent = styleText;
+    //
+    // // const rect = divElem.getBoundingClientRect();
+    // // const [extentWidth, extentHeight] = [rect.width, rect.height];
+    //
+    // // const lowerBaseline = extentHeight * options.lowerBaselinePos;
+    // // const { left, top, width, height } = container.getBoundingClientRect();
+    // // const newLeft = extentWidth * 0.5 - width * 0.5;
+    // // let newTop = lowerBaseline - height;
+    //
+    // // CHANGED: sub position is now fixed
+    //
+    // style.textContent =
+    //   styleText +
+    //   '\n' +
+    //   `
+    //   .player-timedtext-text-container {
+    //     bottom: 10% !important;
+    //     top: auto !important;
+    //     left: 50% !important;
+    //     transform: translateX(-50%) !important;
+    //   }
+    //   .player-timedtext-text-container + .player-timedtext-text-container {
+    //     bottom: 4% !important;
+    //   }
+    //   `;
   }
 }
 
@@ -1181,3 +1182,19 @@ window.addEventListener('keyup', e => {
     activateSubtitle(keyCode);
   }
 });
+
+window.addEventListener('keyup', e => {
+  if (e.key === '`' || e.key === '₩') {
+    toggleSecondarySubtitle();
+  }
+});
+
+function toggleSecondarySubtitle() {
+  const el = document.querySelector('.nflxmultisubs-subtitle-svg');
+
+  if (el.style.display === 'none') {
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
+}
